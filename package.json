@@ -1,0 +1,85 @@
+{
+  "name": "delivery-service",
+  "version": "1.0.0",
+  "main": "server/server.js",
+  "engines": {
+    "node": ">=12"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "watch": "make watch",
+    "pretest": "node ./scripts/view.js",
+    "test": "make test",
+    "test-cov": "make test-cov",
+    "test-coveralls": "make test-coveralls",
+    "start": "make start",
+    "start-dev": "make start-dev",
+    "start-staging": "make start-staging",
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md"
+  },
+  "author": {
+    "name": "Chao Li",
+    "email": "ccharlieli@live.com",
+    "url": ""
+  },
+  "contributors": [
+    "Chao Li"
+  ],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {
+    "@sentry/node": "^5.15.5",
+    "bluebird": "^3.7.2",
+    "bunyan-logger-factory": "^1.0.1",
+    "debug": "^3.1.0",
+    "env-var": "^6.0.4",
+    "es6-error": "^4.1.1",
+    "express-bunyan-logger": "^1.3.3",
+    "file-register": "^0.1.0",
+    "helmet": "^3.20.0",
+    "joi": "^17.2.1",
+    "loopback": "^3.26.0",
+    "loopback-boot": "^3.3.1",
+    "loopback-component-explorer": "^6.5.1",
+    "loopback-connector": "^4.8.0",
+    "loopback-connector-couchbasex": "^1.2.5",
+    "loopback-datasource-juggler": "^3.16.0",
+    "loopback-ds-timestamp-mixin": "^3.4.1",
+    "loopback-healthcheck-middleware": "^0.0.2",
+    "serve-favicon": "^2.5.0",
+    "ssl-root-cas": "^1.2.5",
+    "strong-error-handler": "^2.3.2",
+    "strong-remoting": "^3.14.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^8.1.0",
+    "@commitlint/config-conventional": "^7.6.0",
+    "@paulvollmer/jsonlint": "^1.8.4",
+    "coveralls": "^3.0.6",
+    "eslint": "^4.12.1",
+    "eslint-config-prettier": "^3.1.0",
+    "eslint-config-wcl-backend": "^0.3.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "husky": "^3.0.3",
+    "mocha": "^8.1.3",
+    "nodemon": "^1.19.1",
+    "prettier": "^2.0.5",
+    "should": "^13.2.3",
+    "swagger-supertest": "^0.0.5"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "make lint",
+      "pre-push": "make lint"
+    }
+  },
+  "private": true,
+  "license": "UNLICENSED"
+}

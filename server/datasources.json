@@ -1,0 +1,17 @@
+{
+  "deliveryDS": {
+    "name": "deliveryDS",
+    "connector": "couchbasex",
+    "version": 5,
+    "cluster": {
+      "url": "${cbHost}",
+      "username": "${cbUsername}",
+      "password": "${cbPassword}",
+      "options": {}
+    },
+    "bucket": {
+      "name": "${bucketName}"
+    },
+    "connectionTimeout": "${bucketTimeout}"
+  }
+}
