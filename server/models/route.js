@@ -1,14 +1,52 @@
 'use strict';
 
+const R = require('ramda');
 const Promise = require('bluebird');
 const lib = require('../lib');
 const ServiceError = lib.error;
-const { pathSchema } = lib.schema;
-const { validSchema, subDocMutateIn, disableRemoteMethods } = lib.utils;
+const { disableRemoteMethods } = lib.utils;
 
 module.exports = (Route) => {
   // disable default endpoints
   disableRemoteMethods(Route);
+
+  Route.addToRoute = async (start, end, cost) => {
+    const { graph } = Route.app;
+    graph.set(start, end, cost);
+  };
+
+  Route.removeFromRoute = async (start, end) => {
+    const { graph } = Route.app;
+    graph.remove(start, end);
+  };
+
+  /**
+   * Refresh graph with paths from DB
+   * @param {string} transactionId
+   * @param {string} userId
+   */
+  Route.refreshGraph = async (transactionId, userId) => {
+    const { logger, graph } = Route.app;
+    const { Path } = Route.app.models;
+    logger.info(`refresh graph`, { transactionId, userId });
+
+    const res = await Path.getPaths(transactionId, userId);
+    const paths = R.mergeAll(res.data);
+    logger.info(`refresh graph with data`, { transactionId, paths });
+
+    graph.refresh(paths);
+    return;
+  };
+
+  Route.remoteMethod('refreshGraph', {
+    description: 'calculate cost of given route',
+    http: { path: '/refresh', verb: 'post', status: 204 },
+    returns: { arg: 'data', type: 'object' },
+    accepts: [
+      { arg: 'transactionId', required: true, type: 'string', http: (ctx) => ctx.req.headers['x-transaction-id'] },
+      { arg: 'userId', required: true, type: 'string', http: (ctx) => ctx.req.headers['x-user-id'] },
+    ],
+  });
 
   /**
    * Calculate cost of given route
@@ -55,5 +93,35 @@ module.exports = (Route) => {
     ],
   });
 
-  Route.countRoutes = async (transactionId, userId, start, end) => {};
+  Route.findRoutes = async (
+    transactionId,
+    userId,
+    start,
+    end,
+    costLimit = Infinity,
+    routeLimit = Infinity,
+    stopLimit = Infinity,
+    pathReuseLimit = 1
+  ) => {
+    const { logger, graph } = Route.app;
+    logger.info(`find routes for given start point and end point`, { transactionId, userId, start, end });
+
+    return graph.findRoutes(start, end, { costLimit, routeLimit, stopLimit, pathReuseLimit });
+  };
+
+  Route.remoteMethod('findRoutes', {
+    description: 'find routes',
+    http: { path: '/', verb: 'get' },
+    returns: { arg: 'data', type: 'object' },
+    accepts: [
+      { arg: 'transactionId', required: true, type: 'string', http: (ctx) => ctx.req.headers['x-transaction-id'] },
+      { arg: 'userId', required: true, type: 'string', http: (ctx) => ctx.req.headers['x-user-id'] },
+      { arg: 'start', required: true, type: 'string', http: { source: 'query' } },
+      { arg: 'end', required: true, type: 'string', http: { source: 'query' } },
+      { arg: 'costLimit', type: 'number', http: { source: 'query' } },
+      { arg: 'routeLimit', type: 'number', http: { source: 'query' } },
+      { arg: 'stopLimit', type: 'number', http: { source: 'query' } },
+      { arg: 'pathReuseLimit', type: 'number', http: { source: 'query' } },
+    ],
+  });
 };

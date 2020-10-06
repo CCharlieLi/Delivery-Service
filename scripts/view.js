@@ -23,13 +23,6 @@ const designDocs = [
             }
           }`,
         },
-        byTypeAndCreatedAt: {
-          map: `function(doc, meta) {
-            if (doc._type && doc.createdAt) {
-              emit([doc._type].concat(dateToArray(doc.createdAt)), { username: doc.username });
-            }
-          }`,
-        },
       },
     },
   },

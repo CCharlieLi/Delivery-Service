@@ -15,6 +15,47 @@ exports.validSchema = async (schema, data, opts = {}) =>
   });
 
 /**
+ * Query data from Couchbase by QueryView
+ * @param {string} transactionId
+ * @param {object} Model
+ * @param {array} params
+ */
+exports.queryView = (transactionId, Model, params) => {
+  return Model.getConnector()
+    .view(...params)
+    .catch((err) => Promise.reject(new ServiceError(1002, err, { transactionId })));
+};
+
+/**
+ * Get documents by ids (Batch query)
+ * @param {object} Model
+ * @param {array} ids
+ * @param {number} batch
+ */
+exports.findByBatch = async (Model, ids, batch = 2000) => {
+  let tmp;
+  let result = [];
+  for (let i = 0; i < ids.length / batch; i++) {
+    tmp = ids.slice(i * batch, batch + i * batch);
+    if (tmp.length === 0) break;
+    result = result.concat(await Model.findByIds(tmp));
+    if (tmp.length < batch) break;
+  }
+  return result;
+};
+
+/**
+ * Pagination for array data
+ * @param {array} data
+ * @param {number} offset
+ * @param {number} limit
+ */
+exports.pagination = (data, offset = 0, limit) => {
+  limit = limit || data.length;
+  return data.slice(parseInt(offset, 10), parseInt(offset, 10) + parseInt(limit, 10));
+};
+
+/**
  * Disable loopback default endpoints
  * @param {object} model
  * @param {array} allowedMethods

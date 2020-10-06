@@ -1,23 +1,23 @@
 'use strict';
 
+const R = require('ramda');
 const lib = require('../lib');
-const ServiceError = lib.error;
 const { pathSchema } = lib.schema;
-const { validSchema, subDocMutateIn, disableRemoteMethods } = lib.utils;
+const { queryView, pagination, findByBatch, validSchema, subDocMutateIn, disableRemoteMethods } = lib.utils;
 
 module.exports = (Path) => {
   // disable default endpoints
   disableRemoteMethods(Path);
 
   /**
-   * Create path for towns
+   * Upsert path for towns
    * @param {*} transactionId
    * @param {*} userId
    * @param {*} data
    */
-  Path.createPath = async (transactionId, userId, data) => {
+  Path.upsertPath = async (transactionId, userId, data) => {
     const { logger } = Path.app;
-    const { Town } = Path.app.models;
+    const { Town, Route } = Path.app.models;
     logger.info(`create path`, { transactionId, userId, data });
 
     // schema validate
@@ -40,17 +40,61 @@ module.exports = (Path) => {
       operations: [['upsert', `${data.end}`, data.cost, true]],
     });
 
+    // upsert path in global graph
+    await Route.addToRoute(data.start, data.end, data.cost);
+
     return;
   };
 
-  Path.remoteMethod('createPath', {
-    description: 'create path',
+  Path.remoteMethod('upsertPath', {
+    description: 'upsert path',
     http: { path: '/', verb: 'post', status: 204 },
     returns: { arg: 'data', type: 'object' },
     accepts: [
       { arg: 'transactionId', required: true, type: 'string', http: (ctx) => ctx.req.headers['x-transaction-id'] },
       { arg: 'userId', required: true, type: 'string', http: (ctx) => ctx.req.headers['x-user-id'] },
       { arg: 'data', required: true, type: 'object', http: { source: 'form' } },
+    ],
+  });
+
+  /**
+   * Get paths
+   * @param {string} transactionId
+   * @param {string} userId
+   * @param {object} page
+   */
+  Path.getPaths = async (transactionId, userId, page) => {
+    const { logger } = Path.app;
+    logger.info(`get paths`, { transactionId, userId });
+
+    const limit = page && page.limit;
+    const offset = page && page.offset;
+
+    // Query paths from DB
+    const queryRes = await queryView(transactionId, Path, ['findAll', 'byType', { key: 'Path', stale: 1 }]);
+    const data = await findByBatch(
+      Path,
+      pagination(queryRes, offset, limit).map((path) => path.id)
+    ).then((paths) =>
+      paths.map((each) => ({
+        [each.id]: R.dissoc('id', R.dissoc('createdAt', R.dissoc('updatedAt', each.toJSON()))),
+      }))
+    );
+
+    return {
+      meta: { total: queryRes.length },
+      data,
+    };
+  };
+
+  Path.remoteMethod('getPaths', {
+    description: 'get paths',
+    http: { path: '/', verb: 'get' },
+    returns: { root: true },
+    accepts: [
+      { arg: 'transactionId', required: true, type: 'string', http: (ctx) => ctx.req.headers['x-transaction-id'] },
+      { arg: 'userId', required: true, type: 'string', http: (ctx) => ctx.req.headers['x-user-id'] },
+      { arg: 'page', type: 'object', http: { source: 'query' } },
     ],
   });
 };
