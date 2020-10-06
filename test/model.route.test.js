@@ -120,7 +120,7 @@ describe('Route API', () => {
       });
     });
 
-    it('should return 204 when refresh graph', async () => {
+    it('should return 200 with routes', async () => {
       const { body } = await request(app)
         .get('/api/routes?start=E&end=D&stopLimit=4')
         .set('x-transaction-id', 'test-transactionId')
@@ -130,7 +130,7 @@ describe('Route API', () => {
       body.data[0].cost.should.be.equal(9);
     });
 
-    it('should return 204 when refresh graph', async () => {
+    it('should return 200 with routes', async () => {
       const { body } = await request(app)
         .get('/api/routes?start=E&end=E')
         .set('x-transaction-id', 'test-transactionId')

@@ -1,6 +1,6 @@
 'use strict';
 
-const Graph = require('../lib/graph');
+const Graph = require('graph-route-finder');
 const loggerFactory = require('bunyan-logger-factory');
 
 module.exports = (app) => {

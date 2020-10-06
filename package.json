@@ -20,11 +20,8 @@
   "author": {
     "name": "Chao Li",
     "email": "ccharlieli@live.com",
-    "url": ""
+    "url": "https://www.charlieli.cn/"
   },
-  "contributors": [
-    "Chao Li"
-  ],
   "repository": {
     "type": "git",
     "url": ""
@@ -42,6 +39,7 @@
     "es6-error": "^4.1.1",
     "express-bunyan-logger": "^1.3.3",
     "file-register": "^0.1.0",
+    "graph-route-finder": "^1.0.0",
     "helmet": "^3.20.0",
     "joi": "^17.2.1",
     "loopback": "^3.26.0",
