@@ -21,5 +21,6 @@ node_js:
   - "12"
 before_script:
   - ./dockers/up.sh
+  - node ./scripts/view.js
 script:
   - make test-coveralls
