@@ -13,7 +13,7 @@ module.exports = {
 
   // Log
   logName: env.get('LOG_NAME').default('delivery').asString(),
-  logStream: env.get('LOG_STREAM').default('debug').asString(),
+  logStream: env.get('LOG_STREAM').default('file').asString(),
   syslogHost: env.get('SYSLOG_HOST').asString(),
   syslogPort: env.get('SYSLOG_PORT').asInt(),
   syslogProto: env.get('SYSLOG_PROTO').asString(),
