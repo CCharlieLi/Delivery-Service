@@ -1,5 +1,9 @@
 # Delivery Service
 
+[![Build Status](https://travis-ci.com/CCharlieLi/Delivery-Service.svg?branch=main)](https://travis-ci.com/CCharlieLi/Delivery-Service)
+[![Coverage Status](https://coveralls.io/repos/github/CCharlieLi/Delivery-Service/badge.svg?branch=main)](https://coveralls.io/github/CCharlieLi/Delivery-Service?branch=main)
+
+
 
 ## Dependencies
 
