@@ -8,6 +8,8 @@
   "scripts": {
     "lint": "eslint .",
     "watch": "make watch",
+    "docker-up": "./dockers/up.sh",
+    "docker-down": "./dockers/down.sh",
     "pretest": "node ./scripts/view.js",
     "test": "make test",
     "test-cov": "make test-cov",
